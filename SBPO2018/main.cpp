@@ -14,7 +14,25 @@ using namespace std;
 #include "heuristicas.cpp"
 #include "vns.cpp"
 
-void execute_heuristics_greedy(int j, int nL, int nR){
+void printSolution(const Solucao& solucao) {
+    for (int i = 0; i < solucao.vectorBits.size(); i++) {
+        if (solucao.vectorBits[i]) {
+            printf("%d ", i);
+        }
+    }
+    printf("\n");
+    for (int i = 0; i < solucao.is_elem.size(); i++) {
+        if (solucao.is_elem[i]) {
+            printf("%d ", i);
+        }
+    }
+    // for (int i = 0; i < solucao.elem.size(); i++) {
+    //     printf("%d ", solucao.elem[i]);
+    // }
+    printf("\n");
+}
+
+void execute_heuristics_greedy(){
     double tempo;
     clock_t t1, t2;
     FILE *txt;
@@ -27,27 +45,19 @@ void execute_heuristics_greedy(int j, int nL, int nR){
     valor_solucao = solucaoH1.vectorBits.count();
     t2 = clock();
     tempo = (t2 - t1)/ (double) CLOCKS_PER_SEC;
-    txt = fopen("Resultados1.txt", "a+");
-    fprintf(txt, "classe_%d_%d_%d ", j, nL, nR);
-    fprintf(txt, "%d ", k);
-    fprintf(txt, "%f ", tempo);
-    fprintf(txt, "%d\n", valor_solucao);
-    fclose(txt);
+    printf("heur1 1\n");
+    printSolution(solucaoH1);
 
     t1 = clock();
     Solucao solucaoH2 = heuristica2_path_relinking2();
     valor_solucao = solucaoH2.vectorBits.count();
     t2 = clock();
     tempo = (t2 - t1)/ (double) CLOCKS_PER_SEC;
-    txt = fopen("ResultadosH2.txt", "a+");
-    fprintf(txt, "classe_%d_%d_%d ", j, nL, nR);
-    fprintf(txt, "%d ", k);
-    fprintf(txt, "%f ", tempo);
-    fprintf(txt, "%d\n", valor_solucao);
-    fclose(txt);
+    printf("heur2 1\n");
+    printSolution(solucaoH2);
 }
 
-void execute_VNS(int j, int nL, int nR){
+void execute_VNS() {
     double tempo;
     clock_t t1, t2;
     FILE *txt;
@@ -56,12 +66,15 @@ void execute_VNS(int j, int nL, int nR){
     int melhor_solucao = -1, pior_solucao = tam_R;
 
 	Solucao solucaoH2 = heuristica2_path_relinking2();
-    for(int i = 1; i <= 10; i++){
+    int nsol = 4;
+    printf("vns %d\n", nsol);
+    for(int i = 1; i <= nsol; i++){
         t1 = clock();
         Solucao solucao = solucaoH2;
         int sol_heuristica = solucao.vectorBits.count();
         if(sol_heuristica < tam_R) solucao = VNS_SO_Grasp_Aceitacao(solucao);
         valor_solucao = solucao.vectorBits.count();
+        printSolution(solucao);
         t2 = clock();
         tempo = (t2 - t1)/ (double) CLOCKS_PER_SEC;
 
@@ -73,16 +86,9 @@ void execute_VNS(int j, int nL, int nR){
     }
     media_tempo /= 10.0;
     media_solucao /= 10.0;
-
-    txt = fopen("ResultadosVNSV.txt", "a+");
-    fprintf(txt, "classe_%d_%d_%d ", j, nL, nR);
-    fprintf(txt, "%d ", k);
-    fprintf(txt, "%f %.2f ", media_tempo, media_solucao);
-    fprintf(txt, "%d %d\n", pior_solucao, melhor_solucao);
-    fclose(txt);
 }
 
-void execute_grasp(int j, int nL, int nR){
+void execute_grasp(){
     double tempo;
     clock_t t1, t2;
     FILE *txt;
@@ -95,10 +101,13 @@ void execute_grasp(int j, int nL, int nR){
     melhor_solucao = -1;
     pior_solucao = tam_R;
 
+    int nsol = 4;
+    printf("grasp %d\n", nsol);
     for(int i = 1; i <= 10; i++){
         t1 = clock();
         Solucao sol = grasp_reativo();
         valor_solucao = sol.vectorBits.count();
+        printSolution(sol);
         t2 = clock();
         tempo = (t2 - t1)/ (double) CLOCKS_PER_SEC;
 
@@ -110,48 +119,33 @@ void execute_grasp(int j, int nL, int nR){
     }
     media_tempo /= 10.0;
     media_solucao /= 10.0;
-
-    txt = fopen("ResultadosGrasp.txt", "a+");
-    fprintf(txt, "classe_%d_%d_%d ", j, nL, nR);
-    fprintf(txt, "%d ", k);
-    fprintf(txt, "%f %f ", media_tempo, media_solucao);
-    fprintf(txt, "%d %d\n", pior_solucao, melhor_solucao);
-    fclose(txt);
-
 }
 
-string path_dir = "..//..//Instances//";
-int execute_all(int type){
-    int allN[] = {40, 60, 80, 100, 140, 180, 200, 240, 280, 300, 400, 500, 600, 800};
-    for (int j = 1; j <= 9; j++) {
-        for (int l = 0; l <= 9; l++) {
-            int nL, nR;
-            string caminho;
-            if(type == 1){
-                nL = allN[l];
-                nR = allN[l];
-                caminho = path_dir + "type1//classe_" + std::to_string(j) + "_" + std::to_string(nL) + "_" + std::to_string(nR) + ".txt";
-            }else if(type == 2){
-                nL = allN[l];
-                nR = allN[l]*0.8;
-                caminho = path_dir + "type1//classe_" + std::to_string(j) + "_" + std::to_string(nL) + "_" + std::to_string(nR) + ".txt";
-            }else{
-                nL = allN[l]*0.8;
-                nR = allN[l];
-                caminho = path_dir + "type1//classe_" + std::to_string(j) + "_" + std::to_string(nL) + "_" + std::to_string(nR) + ".txt";
-            }
+int execute_all(){
+    // string caminho = "cocktails_iba.txt";
+    // int kmin = 64;
+    // int kmax = 92;
 
-            int tem_solucao = Ler_arquivo(caminho, 2);
-            if(tem_solucao){
-                    execute_heuristics_greedy(j, nL, nR);
-					execute_VNS(j, nL, nR);
-					execute_grasp(j, nL, nR);
-            }
-            conjuntosPrincipal.clear();
-            conjuntosPrincipalOrdenado.clear();
-            //conjuntosPrincipal.erase(conjuntosPrincipal.begin(),conjuntosPrincipal.end());
-            //conjuntoR.erase(conjuntoR.begin(),conjuntoR.end());
+    string caminho = "cocktails_all.txt";
+    int kmin = 326;
+    int kmax = 344;
+
+    for (k = kmin; k <= kmax; ++k) {
+        int tem_solucao = Ler_arquivo(caminho, 2);
+        if(tem_solucao){
+                printf("k=%d\n", k);
+                fprintf(stderr, "k=%d\n", k);
+                fprintf(stderr, " heuristic\n");
+                execute_heuristics_greedy();
+                fprintf(stderr, " vns\n");
+                execute_VNS();
+                // fprintf(stderr, " grasp\n");
+                // execute_grasp();
         }
+        conjuntosPrincipal.clear();
+        conjuntosPrincipalOrdenado.clear();
+        //conjuntosPrincipal.erase(conjuntosPrincipal.begin(),conjuntosPrincipal.end());
+        //conjuntoR.erase(conjuntoR.begin(),conjuntoR.end());
     }
     return 0;
 }
@@ -164,9 +158,7 @@ int main(){
     #else
             #error "OS not supported!"
     #endif
-    execute_all(1);
-    execute_all(2);
-    execute_all(3);
+    execute_all();
 
     return 0;
 }

@@ -1,17 +1,17 @@
 
-#define nElem 300
+#define nElem 640
 
 int k;
 int tam_L = 0, tam_R = 0;
 
 /**
-Classe que representa uma solução do problema.
+Classe que representa uma soluï¿½ï¿½o do problema.
 **/
 class Solucao{
 public:
-    bitset<nElem> vectorBits;//Bitset da solução (interseção)
-    vector<bool> is_elem;//Vetor de tamanho igual a quantidade de vertices, onde o índice j será true se o subconjunto j está na solução.
-    vector<int> elem;//Vetor com os indices dos subconjuntos que pertecem a solução.
+    bitset<nElem> vectorBits;//Bitset da soluï¿½ï¿½o (interseï¿½ï¿½o)
+    vector<bool> is_elem;//Vetor de tamanho igual a quantidade de vertices, onde o ï¿½ndice j serï¿½ true se o subconjunto j estï¿½ na soluï¿½ï¿½o.
+    vector<int> elem;//Vetor com os indices dos subconjuntos que pertecem a soluï¿½ï¿½o.
 
     Solucao(){
         setar();
@@ -78,10 +78,10 @@ int Ler_arquivo(string caminho, int tipo){
     arq = fopen( caminho.c_str(),"r" );
 
     if(tipo == 1){
-        fscanf(arq, "%d %d %d", &tam_L, &qtd_instancias, &k);
+        fscanf(arq, "%d %d", &tam_L, &qtd_instancias);
         tam_R = tam_L;
     }
-    else fscanf(arq, "%d %d %d %d", &tam_L, &tam_R, &qtd_instancias, &k);
+    else fscanf(arq, "%d %d %d", &tam_L, &tam_R, &qtd_instancias);
 
     for (int i = 0; i < tam_L; i++){
         conjuntosPrincipal.push_back(Elemento(i));
@@ -92,7 +92,7 @@ int Ler_arquivo(string caminho, int tipo){
     }*/
 
     /**
-    Código para o Pre-processamento que elimina elementos que estão em quantidades de subconjuntos menor do que k.
+    Cï¿½digo para o Pre-processamento que elimina elementos que estï¿½o em quantidades de subconjuntos menor do que k.
     **/
     bool** A = (bool**)malloc(tam_L*sizeof(bool*));
     for(int i = 0; i < tam_L; i++) A[i] = (bool*)malloc(tam_R*sizeof(bool));
